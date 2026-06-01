@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/widget_bg">
+
+    <!-- Header / Title -->
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Daily"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:paddingBottom="8dp" />
+
+    <ProgressBar
+        android:id="@+id/widget_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:progress="0"
+        android:max="100"
+        android:indeterminate="false"
+        android:progressDrawable="@android:drawable/progress_horizontal"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Simplified design per Figma: percentage + subtitle -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/widget_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/widget_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Weighted completion"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray" />
+
+    </LinearLayout>
+
+</LinearLayout>
