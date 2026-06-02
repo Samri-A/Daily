@@ -85,6 +85,5 @@ struct DailyWidget: Widget {
         .configurationDisplayName("Daily")
         .description("Track your daily task progress.")
         .supportedFamilies([.systemSmall, .systemMedium])
-        .contentMarginsDisabled()
     }
 }
