@@ -12,20 +12,20 @@ class EditTask extends StatefulWidget {
 class _EditTaskState extends State<EditTask> {
   late String daily;
   late int priority;
-  late String taskName;
-  Color save_button = Color.fromARGB(255, 13, 13, 17);
+  late Color saveButtonColor;
 
-  initState() {
+  late final TextEditingController taskController;
+
+  @override
+  void initState() {
     super.initState();
     daily = widget.task.habit ? "Daily" : "Once";
     priority = widget.task.priority;
-    taskName = widget.task.taskName;
-    save_button = taskName.trim().isEmpty
+    taskController = TextEditingController(text: widget.task.taskName);
+    saveButtonColor = widget.task.taskName.trim().isEmpty
         ? const Color(0xFF717182)
-        : const Color.fromARGB(255, 10, 10, 11);
+        : const Color(0xFF0A0A0A);
   }
-
-  final TextEditingController taskController = TextEditingController();
 
   @override
   void dispose() {
@@ -49,9 +49,11 @@ class _EditTaskState extends State<EditTask> {
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.arrow_back),
                   ),
-                  const Text(
-                    "Edit Task",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  const Expanded(
+                    child: Text(
+                      "Edit Task",
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   IconButton(
                     onPressed: () async {
@@ -69,13 +71,15 @@ class _EditTaskState extends State<EditTask> {
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text("Delete"),
+                              child: const Text(
+                                "Delete",
+                                style: TextStyle(color: Colors.red),
+                              ),
                             ),
                           ],
                         ),
                       );
-
-                      if (shouldDelete == true) {
+                      if (shouldDelete == true && context.mounted) {
                         Navigator.pop(context, "delete");
                       }
                     },
@@ -86,11 +90,27 @@ class _EditTaskState extends State<EditTask> {
               const SizedBox(height: 16),
               _SectionCard(
                 title: "Task Name",
-                child: Text(
-                  taskName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A),
+                child: TextField(
+                  controller: taskController,
+                  onChanged: (value) {
+                    setState(() {
+                      saveButtonColor = value.trim().isEmpty
+                          ? const Color(0xFF717182)
+                          : const Color(0xFF0A0A0A);
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: "e.g., Read for 30 minutes",
+                    filled: true,
+                    fillColor: const Color(0xFFF3F3F5),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
@@ -146,12 +166,11 @@ class _EditTaskState extends State<EditTask> {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (taskController.text.trim().isEmpty) {
-                      return;
-                    }
+                    final name = taskController.text.trim();
+                    if (name.isEmpty) return;
                     final updatedTask = Task(
                       widget.task.id,
-                      taskController.text.trim(),
+                      name,
                       priority,
                       daily == "Daily",
                       isCompleted: widget.task.isCompleted,
@@ -159,7 +178,7 @@ class _EditTaskState extends State<EditTask> {
                     Navigator.pop(context, updatedTask);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: save_button,
+                    backgroundColor: saveButtonColor,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

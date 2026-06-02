@@ -18,27 +18,12 @@ class _HomeState extends State<Home> {
 
   String _formatDate(DateTime date) {
     const weekdays = [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
+      "Monday", "Tuesday", "Wednesday", "Thursday",
+      "Friday", "Saturday", "Sunday",
     ];
     const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
     ];
     final weekday = weekdays[date.weekday - 1];
     final month = months[date.month - 1];
@@ -53,9 +38,7 @@ class _HomeState extends State<Home> {
 
   Future<void> _loadTasks() async {
     final loadedTasks = await TaskDatabase.instance.readAllTasks();
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     setState(() {
       tasks = loadedTasks;
       isLoading = false;
@@ -70,6 +53,11 @@ class _HomeState extends State<Home> {
 
   Future<void> _updateTask(Task task) async {
     await TaskDatabase.instance.update(task);
+    await WidgetUpdater.refresh();
+  }
+
+  Future<void> _onTaskChanged() async {
+    await _loadTasks();
     await WidgetUpdater.refresh();
   }
 
@@ -111,6 +99,7 @@ class _HomeState extends State<Home> {
                               child: TaskCard(
                                 task: task,
                                 onCompletedChanged: _updateTask,
+                                onTaskChanged: _onTaskChanged,
                               ),
                             ),
                           )
@@ -126,8 +115,7 @@ class _HomeState extends State<Home> {
             context,
             MaterialPageRoute(builder: (context) => const Addtask()),
           );
-
-          if (result != null && result is Task){
+          if (result != null && result is Task) {
             await _addTask(result);
           }
         },

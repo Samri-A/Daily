@@ -22,7 +22,7 @@ class TaskDatabase {
 
     return openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -39,12 +39,27 @@ class TaskDatabase {
         completed INTEGER NOT NULL DEFAULT 0
       )
     ''');
+    await db.execute('''
+      CREATE TABLE metadata(
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE tasks RENAME TO tasks_old');
-      await _createDB(db, newVersion);
+      await db.execute('''
+        CREATE TABLE tasks(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          createdAt  DEFAULT CURRENT_TIMESTAMP,
+          taskName TEXT NOT NULL,
+          priority INTEGER NOT NULL,
+          habit INTEGER NOT NULL,
+          completed INTEGER NOT NULL DEFAULT 0
+        )
+      ''');
       await db.execute('''
         INSERT INTO tasks (id, taskName, priority, habit, completed)
         SELECT
@@ -61,6 +76,14 @@ class TaskDatabase {
         FROM tasks_old
       ''');
       await db.execute('DROP TABLE tasks_old');
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS metadata(
+          key TEXT PRIMARY KEY,
+          value TEXT NOT NULL
+        )
+      ''');
     }
   }
 
@@ -99,18 +122,23 @@ class TaskDatabase {
 
   Future<void> resetDailyTasks() async {
     final db = await database;
+    await db.update('tasks', {'completed': 0}, where: 'habit = ?', whereArgs: [1]);
+    await db.delete('tasks', where: 'habit = ?', whereArgs: [0]);
+  }
 
-    await db.update(
-      'tasks',
-      {'completed': 0},
-      where: 'habit = ?',
-      whereArgs: [1],
-    );
+  Future<String?> getMetadata(String key) async {
+    final db = await database;
+    final rows = await db.query('metadata', where: 'key = ?', whereArgs: [key]);
+    if (rows.isEmpty) return null;
+    return rows.first['value'] as String?;
+  }
 
-    await db.delete(
-      'tasks',
-      where: 'habit = ? AND completed = ?',
-           whereArgs: [ 0, 1]
+  Future<void> setMetadata(String key, String value) async {
+    final db = await database;
+    await db.insert(
+      'metadata',
+      {'key': key, 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 }

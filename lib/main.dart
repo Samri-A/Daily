@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'Screens/Home.dart';
+import 'service/daily_reset_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DailyResetService.instance.init();
   runApp(const MyApp());
 }
 
@@ -13,10 +16,9 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF283593)),
-        useMaterial3: true
+        useMaterial3: true,
       ),
       home: Home(),
     );
   }
 }
-

@@ -6,11 +6,13 @@ import "../Screens/editTask.dart";
 class TaskCard extends StatefulWidget {
   final Task task;
   final Future<void> Function(Task task) onCompletedChanged;
+  final Future<void> Function()? onTaskChanged;
 
   const TaskCard({
     super.key,
     required this.task,
     required this.onCompletedChanged,
+    this.onTaskChanged,
   });
 
   @override
@@ -42,11 +44,10 @@ class _TaskCardState extends State<TaskCard> {
 
         if (result is Task) {
           await TaskDatabase.instance.update(result);
-          // await _loadTasks();
-        }
-        if (result == "delete") {
+          await widget.onTaskChanged?.call();
+        } else if (result == "delete") {
           await TaskDatabase.instance.delete(widget.task.id!);
-          // await _loadTasks();
+          await widget.onTaskChanged?.call();
         }
       },
       child: Container(
