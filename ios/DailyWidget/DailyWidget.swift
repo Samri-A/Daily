@@ -38,7 +38,7 @@ struct DailyWidgetEntryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Daily")
+            Text("Daily Progress")
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(.black)
 
